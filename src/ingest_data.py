@@ -3,7 +3,8 @@ import zipfile
 import pandas as pd
 
 from abc import ABC, abstractmethod
-
+from dotenv import load_dotenv
+load_dotenv()
 
 class DataIngestor(ABC):
     """Abstract class for data ingestor"""
@@ -27,7 +28,7 @@ class ZipDataIngestor(DataIngestor):
             zip_reader.extractall("extracted_data")
 
         # list the extracted file
-        extracted_files = os.listdir("extracted_data")
+        extracted_files = os.listdir(os.getenv("EXTRACTED_DIR"))
         # get the csv files from extracted folder
         csv_files = [file for file in extracted_files if file.endswith(".csv")]
 
@@ -37,7 +38,7 @@ class ZipDataIngestor(DataIngestor):
             raise ValueError("More than one CSV files found. Specify the file to use.")
         else:
             # Reads in data from avb csv file
-            csv_file_data = os.path.join("extracted_data", csv_files[0])
+            csv_file_data = os.path.join(os.getenv("EXTRACTED_DIR"), csv_files[0])
             data = pd.read_csv(csv_file_data)
             return data
 
@@ -53,7 +54,7 @@ class DataIngestorFactory:
 
 # if __name__ == "__main__":
 #     # Path to zip file
-#     file_path = "/home/huda/Desktop/Fiverr/price-predictor/data/archived_data.zip"
+#     file_path = "..."
 #     # file extension
 #     file_extension = os.path.splitext(file_path)[1]
 #
