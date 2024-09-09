@@ -117,5 +117,5 @@ class MissingValuesHandler:
         Execute the current strategy to handle
         missing values in the provided data
         """
-        logging.info("Switching handling missing value strategy.")
-        self.strategy.handle(df)
+        logging.info("Handling missing values using current strategy.")
+        return self.strategy.handle(df)

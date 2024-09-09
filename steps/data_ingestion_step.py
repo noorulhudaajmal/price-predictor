@@ -1,14 +1,12 @@
 import os
-import pandas as pd
 from src.ingest_data import (
-    DataIngestor,
-    DataIngestorFactory,
-    ZipDataIngestor
+    DataIngestorFactory
 )
-from zenml import step
+
+import logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
-@step
 def data_ingestion_step(file_path: str):
     """
     Initiate the respective data ingestor based on the
@@ -18,9 +16,14 @@ def data_ingestion_step(file_path: str):
     :param file_path: path to the data file
     :return: dataframe containing data from file
     """
+
+    logging.info(f"Loading data from path: {file_path}")
+
     file_extension = os.path.splitext(file_path)[1]
     data_ingestor = DataIngestorFactory.get_data_ingestor(file_extension)
     data = data_ingestor.ingest(file_path)
+
+    logging.info("Data loaded")
 
     return data
 

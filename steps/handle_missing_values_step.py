@@ -4,9 +4,11 @@ from src.handle_missing_values import (
     FillMissingValuesStrategy,
     MissingValuesHandler
 )
-from zenml import step
+import mlflow
 
-@step
+import logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 def handle_missing_values(df: pd.DataFrame, strategy:str = "mean"):
     """
     Initiate the respective handler based on strategy
