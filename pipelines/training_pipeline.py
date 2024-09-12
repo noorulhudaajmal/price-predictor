@@ -19,23 +19,23 @@ def training_pipeline():
     """
 
     # Set the experiment name
-    mlflow.set_experiment("House Price Prediction")
+    mlflow.set_experiment("House Price Prediction Exp")
 
     # Start an MLflow run
-    with mlflow.start_run(run_name="linear_regression") as run:
+    with mlflow.start_run(run_name="decision_tree_regression") as run:
 
         run_id = run.info.run_id
 
-        mlflow.set_tag("model_type", "lr")
+        mlflow.set_tag("model_type", "dtr")
         mlflow.set_tag("author", "Huda")
         mlflow.set_tag("version", "1.0")
         mlflow.set_tags({
             "data_version": "v1.0",
             "project": "house_price_prediction",
-            "purpose": "train model with basic preprocessing and Linear Regression"
+            "purpose": "train model with basic preprocessing and Decision Tree Regression"
         })
         # Log experiment description
-        mlflow.set_tag("description", "An experiment to predict house prices using linear regression and log strategy for feature engineering.")
+        mlflow.set_tag("description", "An experiment to predict house prices using decision tree regression and log strategy for feature engineering.")
 
         # 1. Data Ingestion
         raw_data = data_ingestion_step(file_path=os.getenv('FILE_PATH'))
@@ -59,7 +59,7 @@ def training_pipeline():
 
         # 5. Model building step
         trained_model = model_building_step(X_train, y_train)
-        logging.info("Model training and logging completed.")
+        logging.info("Model training completed.")
 
         # 6. Model Evaluation step
         evaluation_metrics = model_evaluation_step(trained_model, X_test, y_test)
@@ -78,12 +78,13 @@ def training_pipeline():
         mlflow.sklearn.log_model(
             sk_model=trained_model,
             artifact_path="model",
-            registered_model_name="house_price_prediction_lr",
+            registered_model_name="house_price_prediction_dtr",
             input_example=X_train.head(1)
         )
 
+        logging.info("Model logged successfully.")
+
         # Register the model in the Model Registry
-        # mlflow.register_model(f"runs:/{run_id}/model", "house_price_prediction_lr")
         logging.info(f"Model registered in MLflow Model Registry with run ID {run_id}.")
 
         return trained_model

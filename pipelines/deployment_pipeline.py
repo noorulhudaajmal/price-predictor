@@ -1,54 +1,50 @@
-import mlflow
 import pandas as pd
-import json
-from steps.dynamic_importer import dynamic_importer
 import logging
-import mlflow.sklearn
+from flask import Flask, request, jsonify
+from inference_pipeline import InferencePipeline
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-def load_model(model_uri):
-    """
-    Loads the deployed model using MLflow model registry.
-    """
-    logging.info(f"Loading model from {model_uri}")
-    model = mlflow.sklearn.load_model(model_uri)
-    logging.info("Model loaded successfully")
-    return model
+# Initialize Flask app
+app = Flask(__name__)
 
-def run_inference(model, batch_data):
-    """
-    Runs inference on the batch data using the loaded model.
-    """
-    logging.info("Running inference on batch data")
-    # preprocessor = model.named_steps["preprocessor"]
-    # batch_data_processed = preprocessor.transform(batch_data)
-    # estimator = model.named_steps["model"]
-    logging.info(f"model is: {model}")
-    preds = model.predict(batch_data)
-    logging.info(f"Predictions: {preds}")
-    return preds
+# inference pipeline instance
+inference_pipeline = None
 
-def deployment_pipeline():
-    """
-    Pipeline that imports data dynamically, loads the
-    deployed model, and runs predictions in real time.
-    """
 
-    # Step 1: Fetch dynamic data (equivalent to a real-world API call)
-    logging.info("Fetching dynamic batch data")
-    json_data = dynamic_importer()
-    batch_data = pd.read_json(json_data, orient="split")
+# API route to handle predictions
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        # 1. Get the incoming JSON data
+        data = request.get_json()
 
-    # Step 2: Load the deployed model from MLflow
-    model_uri = "models:/house_price_prediction_lr/8"
-    model = load_model(model_uri)
+        # 2. Convert JSON data to pandas DataFrame
+        batch_data = pd.DataFrame(data)
 
-    # Step 3: Run predictions on the fetched batch data
-    predictions = run_inference(model, batch_data)
+        # 3. Make predictions using the inference pipeline
+        predictions = inference_pipeline.run_inference(batch_data)
 
-    return predictions
+        # 4. Return predictions as a JSON response
+        response = {"predictions": predictions.tolist()}
+        return jsonify(response)
+
+    except Exception as e:
+        # error log
+        logging.error(f"Error during prediction: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+def load_app():
+    # Model loading
+    model_uri = "models:/house_price_prediction_lr/4"
+
+    # Initialize the InferencePipeline
+    global inference_pipeline
+    inference_pipeline = InferencePipeline(model_uri)
+
+    # Start the Flask app on port 8000
+    app.run(host="0.0.0.0", port=8000, debug=True)
+
 
 if __name__ == "__main__":
-    predictions = deployment_pipeline()
-    print("Predictions:", predictions)
+    load_app()

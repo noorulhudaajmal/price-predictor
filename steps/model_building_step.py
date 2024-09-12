@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.linear_model import LinearRegression
 
 import logging
@@ -59,19 +59,18 @@ def model_building_step(
     pipeline = Pipeline(
         steps=[
             ("preprocessor", preprocessor),
-            ("model", LinearRegression())
+            ("model", DecisionTreeRegressor())
         ]
     )
 
     logging.info("Starting model training pipeline with MLflow...")
 
-    run = mlflow.active_run() or mlflow.start_run(run_name="model_building_step")
+
+    mlflow.sklearn.autolog(log_models=False)  # auto-logging for sklearn for logging training metrics
 
     try:
 
-        # mlflow.sklearn.autolog()  # auto-logging for sklearn
-
-        logging.info("Building and training Linear Regression Model.")
+        logging.info("Building and training Regression Model.")
         pipeline.fit(X_train, y_train)  # training the pipeline
         logging.info("Model training completed.")
 
@@ -91,13 +90,10 @@ def model_building_step(
         logging.info(f"Model expects the following columns: {expected_columns}")
         # mlflow.log_param("expected_columns", expected_columns)
 
+
     except Exception as e:
         logging.error(f"Error occurred while training the Model: {e}")
         raise e
-
-    finally:
-        #end the run after training and logging are completed
-        mlflow.end_run()
 
     logging.info("Model training pipeline with MLflow completed.")
 
