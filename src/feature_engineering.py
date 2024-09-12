@@ -92,15 +92,23 @@ class OneHotEncoding(FeatureEngineeringStrategy):
 
 
 class FeatureEngineer:
-    def __init__(self, strategy: FeatureEngineeringStrategy):
+    def __init__(self, strategy: FeatureEngineeringStrategy, noise_features: list = None):
         self.strategy = strategy
+        self.noise_features = noise_features
 
     def set_strategy(self, strategy: FeatureEngineeringStrategy):
         logging.info("Switching feature engineering strategy.")
         self.strategy = strategy
 
+    def drop_noise_features(self, df: pd.DataFrame):
+        logging.info("Dropping Noise Features...")
+        df = df.drop(columns=self.noise_features)
+        return df
+
     def apply_feature_engineering(self, df: pd.DataFrame):
         logging.info("Applying feature engineering strategy.")
+        if self.noise_features:
+            df = self.drop_noise_features(df)
         return self.strategy.apply_transformation(df)
 
 

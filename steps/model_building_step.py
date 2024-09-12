@@ -59,7 +59,7 @@ def model_building_step(
     pipeline = Pipeline(
         steps=[
             ("preprocessor", preprocessor),
-            ("model", DecisionTreeRegressor())
+            ("model", LinearRegression())
         ]
     )
 

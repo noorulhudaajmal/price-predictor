@@ -36,7 +36,7 @@ def predict():
 
 def load_app():
     # Model loading
-    model_uri = "models:/house_price_prediction_lr/4"
+    model_uri = "models:/house_price_prediction_lr/1"
 
     # Initialize the InferencePipeline
     global inference_pipeline

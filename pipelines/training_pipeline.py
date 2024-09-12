@@ -22,20 +22,20 @@ def training_pipeline():
     mlflow.set_experiment("House Price Prediction Exp")
 
     # Start an MLflow run
-    with mlflow.start_run(run_name="decision_tree_regression") as run:
+    with mlflow.start_run(run_name="linear_regression") as run:
 
         run_id = run.info.run_id
 
-        mlflow.set_tag("model_type", "dtr")
+        mlflow.set_tag("model_type", "lr")
         mlflow.set_tag("author", "Huda")
         mlflow.set_tag("version", "1.0")
         mlflow.set_tags({
             "data_version": "v1.0",
             "project": "house_price_prediction",
-            "purpose": "train model with basic preprocessing and Decision Tree Regression"
+            "purpose": "train model with basic preprocessing and Linear Regression"
         })
         # Log experiment description
-        mlflow.set_tag("description", "An experiment to predict house prices using decision tree regression and log strategy for feature engineering.")
+        mlflow.set_tag("description", "An experiment to predict house prices using linear regression and log strategy for feature engineering.")
 
         # 1. Data Ingestion
         raw_data = data_ingestion_step(file_path=os.getenv('FILE_PATH'))
@@ -47,7 +47,8 @@ def training_pipeline():
         # 3. Feature Engineering
         transformed_data = apply_feature_engineering(df=cleaned_data,
                                                      strategy="log",
-                                                     features=["Gr Liv Area", "SalePrice"])
+                                                     features=["Gr Liv Area", "SalePrice"],
+                                                     noise_features=["Order", "PID"])
         mlflow.log_param("feature_engineering_strategy", "log")
 
         # 4. Data splitting step
@@ -78,7 +79,7 @@ def training_pipeline():
         mlflow.sklearn.log_model(
             sk_model=trained_model,
             artifact_path="model",
-            registered_model_name="house_price_prediction_dtr",
+            registered_model_name="house_price_prediction_lr",
             input_example=X_train.head(1)
         )
 
