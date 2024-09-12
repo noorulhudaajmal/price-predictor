@@ -637,11 +637,9 @@ def get_prediction(input_data):
 
 input_data = pd.DataFrame.from_dict(st.session_state, orient="index").transpose()
 
-st.dataframe(input_data, use_container_width=True)
-
-if st.button("Predict"):
+if st.button("Predict Price"):
     st.write("Sending data to API...")
     prediction = get_prediction(input_data.to_dict(orient='records'))
 
     if prediction:
-        st.success(f"Predicted House Price: ${prediction[0]:,.2f}")
+        st.success(f"## Predicted House Price: ${prediction[0]:,.2f}")

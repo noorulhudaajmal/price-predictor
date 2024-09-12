@@ -4,6 +4,7 @@ from steps.dynamic_importer import dynamic_importer
 import logging
 import mlflow.sklearn
 
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     # for testing
     json_data = dynamic_importer()  # to get test data
     test_data = pd.read_json(json_data, orient="split")
-    model_uri = "models:/house_price_prediction_lr/4"
+    model_uri = "models:/house_price_prediction_lr/1"
 
     # Create an instance of the InferencePipeline class
     pipeline = InferencePipeline(model_uri)
